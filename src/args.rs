@@ -36,6 +36,9 @@ pub struct Args {
     /// This effectively skips the 5 second startup delay.
     #[clap(long, short = 'd')]
     pub boot: bool,
+    /// Mount a persistent store which may be used by OVMF to store non-volatile variables
+    #[clap(long, short = 'p')]
+    pub persistent: bool,
 }
 
 impl Args {

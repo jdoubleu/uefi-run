@@ -73,6 +73,29 @@ fn main() {
         .additional_args
         .extend(args.qemu_args.iter().cloned());
 
+    // Prepare persistent mount
+    if args.persistent {
+        let persistent_image_path = {
+            let mut base = std::env::home_dir().unwrap_or(PathBuf::from("/"));
+            base.push(".uefi-run.persistent.fat");
+            base
+        };
+
+        if !persistent_image_path.exists() {
+            EfiImage::new(&persistent_image_path, 0x40_0000)
+                .expect("Failed to create persistent image");
+        }
+
+        qemu_config.drives.insert(
+            0,
+            QemuDriveConfig {
+                file: persistent_image_path.to_str().unwrap().to_string(),
+                media: "disk".to_string(),
+                format: "raw".to_string(),
+            },
+        )
+    }
+
     // Run qemu
     let mut qemu_process = qemu_config.run().expect("Failed to start qemu");
 
